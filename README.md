@@ -8,7 +8,7 @@
 
 ---
 
-A Streamlit dashboard that visualizes data from the [urban-research](https://github.com/kkarbasi/urban-research) package — population growth, job growth, wages, and unemployment for 370+ US metros and cities.
+A Streamlit dashboard that visualizes data from the [cityscope](https://github.com/kkarbasi/cityscope) package — population growth, job growth, wages, and unemployment for 370+ US metros and cities.
 
 ## Setup
 
@@ -18,8 +18,8 @@ cd urban-research-ui
 uv sync
 
 # Fetch data (only needed once)
-uv run urban-research fetch census_population
-uv run urban-research fetch bls_employment --skip-laus
+uv run cityscope fetch census_population
+uv run cityscope fetch bls_employment --skip-laus
 
 # Launch dashboard
 uv run python run.py
@@ -36,9 +36,9 @@ Open **http://localhost:8501**.
 
 ## Dependencies
 
-This dashboard uses the [`urban-research`](https://github.com/kkarbasi/urban-research) package for data fetching and storage. The package provides:
-- CLI (`urban-research fetch`, `query`, `status`)
-- Python API (`from urban_research import api`)
+This dashboard uses the [`cityscope`](https://github.com/kkarbasi/cityscope) package for data fetching and storage. The package provides:
+- CLI (`cityscope fetch`, `query`, `status`)
+- Python API (`from cityscope import api`)
 - SQLite storage with upsert semantics
 
 ## License

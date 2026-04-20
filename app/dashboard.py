@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from urban_research import api
+from cityscope import api
 
 # ---------------------------------------------------------------------------
 # Config & data loading
