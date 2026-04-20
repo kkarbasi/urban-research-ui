@@ -1,0 +1,19 @@
+[project]
+name = "urban-research-ui"
+version = "0.1.0"
+description = "Streamlit dashboard for urban-research data pipeline"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Kaveh Karbasi", email = "kkarbasi@berkeley.edu" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "pandas>=3.0.2",
+    "plotly>=6.7.0",
+    "streamlit>=1.56.0",
+    "urban-research",
+]
+
+[tool.uv.sources]
+urban-research = { git = "https://github.com/kkarbasi/urban-research.git" }
