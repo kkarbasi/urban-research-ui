@@ -156,9 +156,161 @@ st.divider()
 # Tabs
 # ---------------------------------------------------------------------------
 
-tab_rankings, tab_trends, tab_compare, tab_explorer = st.tabs(
-    ["Rankings", "Trends", "City Profile", "Data Explorer"]
+tab_lookup, tab_rankings, tab_trends, tab_compare, tab_explorer = st.tabs(
+    ["Address Lookup", "Rankings", "Trends", "City Profile", "Data Explorer"]
 )
+
+
+# ---- Tab 0: Address Lookup ----
+with tab_lookup:
+    st.subheader("Look up any US address")
+    st.caption(
+        "Enter a US address to see everything cityscope knows about the metro, "
+        "city, and county that contain it. Powered by the Census Geocoder."
+    )
+
+    col_addr, col_opts = st.columns([3, 1])
+    with col_addr:
+        address_input = st.text_input(
+            "Address",
+            value="1600 Amphitheatre Pkwy, Mountain View, CA",
+            placeholder="123 Main St, City, ST 12345",
+            label_visibility="collapsed",
+        )
+    with col_opts:
+        auto_fetch = st.toggle("Auto-fetch missing", value=True,
+                               help="Fetch data from Census/BLS on-the-fly "
+                                    "if not already in the local DB.")
+
+    go = st.button("Look up", type="primary", use_container_width=False)
+
+    if go and address_input.strip():
+        from cityscope.geocoding import GeocodingError
+
+        with st.spinner("Geocoding and fetching data..."):
+            try:
+                report = api.lookup(address_input.strip(), auto_fetch=auto_fetch)
+            except GeocodingError as e:
+                st.error(f"Geocoding failed: {e}")
+                report = None
+
+        if report is not None:
+            # Clear cached data so newly-fetched geos/points show in other tabs
+            load_all_data.clear()
+
+            st.divider()
+
+            # Address header with map
+            header_cols = st.columns([2, 1])
+            with header_cols[0]:
+                st.markdown(f"**Matched address:** `{report.matched_address}`")
+                if report.state_fips:
+                    st.caption(f"State FIPS: {report.state_fips}")
+                if report.tract_geoid:
+                    st.caption(f"Census tract: {report.tract_geoid}")
+                if report.latitude and report.longitude:
+                    st.caption(
+                        f"Coordinates: {report.latitude:.4f}, {report.longitude:.4f}"
+                    )
+            with header_cols[1]:
+                if report.latitude and report.longitude:
+                    st.map(
+                        pd.DataFrame(
+                            {"lat": [report.latitude], "lon": [report.longitude]}
+                        ),
+                        zoom=10,
+                        size=100,
+                    )
+
+            st.divider()
+
+            # Three columns — metro, city, county
+            def render_snapshot(col, title: str, snapshot):
+                with col:
+                    st.markdown(f"### {title}")
+                    if snapshot is None:
+                        st.info("No data available.")
+                        return
+
+                    st.markdown(f"**{snapshot.name}**")
+                    st.caption(f"geo_id: `{snapshot.geo_id}` · year: {snapshot.year}")
+
+                    if snapshot.population is not None:
+                        st.metric("Population", f"{snapshot.population:,}")
+
+                    for metric in sorted(snapshot.metrics):
+                        if metric == "population":
+                            continue
+                        label = METRIC_LABELS.get(metric, metric)
+                        value = snapshot.metrics[metric]
+                        if "pct" in metric or "rate" in metric:
+                            sign = "+" if "change" in metric else ""
+                            st.metric(label, f"{value:{sign}.2f}%")
+                        elif metric in ("avg_annual_pay", "avg_weekly_wage"):
+                            st.metric(label, f"${value:,.0f}")
+                        else:
+                            st.metric(label, f"{value:,.0f}")
+
+            metro_col, city_col, county_col = st.columns(3)
+            render_snapshot(metro_col, "Metro Area", report.metro)
+            render_snapshot(city_col, "City", report.city)
+            render_snapshot(county_col, "County", report.county)
+
+            # Warnings
+            if report.warnings:
+                st.divider()
+                for w in report.warnings:
+                    st.warning(w)
+
+            # Historical trends for this location (if we have multiple years)
+            st.divider()
+            st.markdown("### Historical Trends")
+            df_latest = load_all_data()
+            geo_ids_in_report = [
+                s.geo_id for s in (report.metro, report.city, report.county)
+                if s is not None
+            ]
+            df_history = df_latest[df_latest["geo_id"].isin(geo_ids_in_report)]
+
+            if df_history.empty:
+                st.caption("No multi-year history available for these geographies.")
+            else:
+                available_metrics_here = sorted(df_history["metric"].unique())
+                chosen_metric = st.selectbox(
+                    "Metric",
+                    options=available_metrics_here,
+                    format_func=lambda m: METRIC_LABELS.get(m, m),
+                    key="lookup_metric",
+                )
+                df_plot = df_history[df_history["metric"] == chosen_metric]
+                if df_plot["year"].nunique() > 1:
+                    fig = px.line(
+                        df_plot, x="year", y="value",
+                        color="name", markers=True,
+                        labels={
+                            "value": METRIC_LABELS.get(chosen_metric, chosen_metric),
+                            "year": "Year",
+                            "name": "",
+                        },
+                    )
+                    yformat = {}
+                    if "pct" in chosen_metric or "rate" in chosen_metric:
+                        yformat = {"ticksuffix": "%"}
+                    elif "pay" in chosen_metric or "wage" in chosen_metric:
+                        yformat = {"tickprefix": "$", "tickformat": ","}
+                    else:
+                        yformat = {"tickformat": ","}
+                    fig.update_layout(
+                        height=400, yaxis=yformat, xaxis={"dtick": 1},
+                        legend={"orientation": "h", "y": -0.25},
+                        margin={"t": 10},
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.caption(
+                        f"Only one year of `{chosen_metric}` data available — "
+                        "cannot plot trend."
+                    )
 
 
 # ---- Tab 1: Rankings ----

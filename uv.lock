@@ -141,6 +141,19 @@ wheels = [
 ]
 
 [[package]]
+name = "cityscope"
+version = "0.2.0"
+source = { git = "https://github.com/kkarbasi/cityscope.git#1f343f8bcb82be2393b30abc319bdd8e5e9a33aa" }
+dependencies = [
+    { name = "click" },
+    { name = "httpx" },
+    { name = "pandas" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+    { name = "rich" },
+]
+
+[[package]]
 name = "click"
 version = "8.3.2"
 source = { registry = "https://pypi.org/simple" }
@@ -938,37 +951,22 @@ wheels = [
 ]
 
 [[package]]
-name = "urban-research"
-version = "0.1.0"
-source = { git = "https://github.com/kkarbasi/urban-research.git#cdec7d41894c61c3f1b53fd2fcd62b2f8bca8fbc" }
-dependencies = [
-    { name = "click" },
-    { name = "httpx" },
-    { name = "pandas" },
-    { name = "plotly" },
-    { name = "pydantic" },
-    { name = "pyyaml" },
-    { name = "rich" },
-    { name = "streamlit" },
-]
-
-[[package]]
 name = "urban-research-ui"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cityscope" },
     { name = "pandas" },
     { name = "plotly" },
     { name = "streamlit" },
-    { name = "urban-research" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "cityscope", git = "https://github.com/kkarbasi/cityscope.git" },
     { name = "pandas", specifier = ">=3.0.2" },
     { name = "plotly", specifier = ">=6.7.0" },
     { name = "streamlit", specifier = ">=1.56.0" },
-    { name = "urban-research", git = "https://github.com/kkarbasi/urban-research.git" },
 ]
 
 [[package]]
