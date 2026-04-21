@@ -156,8 +156,8 @@ st.divider()
 # Tabs
 # ---------------------------------------------------------------------------
 
-tab_lookup, tab_rankings, tab_trends, tab_compare, tab_explorer = st.tabs(
-    ["Address Lookup", "Rankings", "Trends", "City Profile", "Data Explorer"]
+tab_rankings, tab_trends, tab_compare, tab_explorer, tab_lookup = st.tabs(
+    ["Rankings", "Trends", "City Profile", "Data Explorer", "Address Lookup"]
 )
 
 
