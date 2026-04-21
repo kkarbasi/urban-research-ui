@@ -189,14 +189,18 @@ with tab_lookup:
 
         with st.spinner("Geocoding and fetching data..."):
             try:
-                report = api.lookup(address_input.strip(), auto_fetch=auto_fetch)
+                st.session_state["lookup_report"] = api.lookup(
+                    address_input.strip(), auto_fetch=auto_fetch,
+                )
+                # Clear cached data so newly-fetched geos/points show in other tabs
+                load_all_data.clear()
             except GeocodingError as e:
                 st.error(f"Geocoding failed: {e}")
-                report = None
+                st.session_state.pop("lookup_report", None)
 
-        if report is not None:
-            # Clear cached data so newly-fetched geos/points show in other tabs
-            load_all_data.clear()
+    report = st.session_state.get("lookup_report")
+
+    if report is not None:
 
             st.divider()
 
