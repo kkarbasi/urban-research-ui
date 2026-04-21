@@ -33,13 +33,20 @@ Open **http://localhost:8501**.
 - **Trends** — Compare up to 15 metros with line charts across any metric
 - **City Profile** — All metrics for a single metro, charted over time
 - **Data Explorer** — Full data table with filters + CSV download
+- **Address Lookup** — Enter any US address to see metro, city, and county stats side-by-side with a map pin and historical trend charts. Toggle **Auto-fetch missing** to pull data from Census/BLS on-the-fly for counties or smaller cities not in the default fetch.
 
 ## Dependencies
 
-This dashboard uses the [`cityscope`](https://github.com/kkarbasi/cityscope) package for data fetching and storage. The package provides:
-- CLI (`cityscope fetch`, `query`, `status`)
-- Python API (`from cityscope import api`)
+This dashboard uses the [`cityscope`](https://github.com/kkarbasi/cityscope) package for data fetching and storage, pulled directly from its GitHub repository (see `[tool.uv.sources]` in `pyproject.toml`). The package provides:
+- CLI (`cityscope fetch`, `query`, `status`, `lookup`)
+- Python API (`from cityscope import api` — `fetch`, `query`, `lookup`, `to_dataframe`, etc.)
 - SQLite storage with upsert semantics
+
+To pull the latest cityscope changes during development:
+
+```bash
+uv sync --upgrade-package cityscope
+```
 
 ## License
 
