@@ -97,6 +97,18 @@ METRIC_LABELS = {
     "unemployment_rate": "Unemployment Rate %",
     "avg_annual_pay": "Avg. Annual Pay",
     "avg_weekly_wage": "Avg. Weekly Wage",
+    "median_rent_all": "Median Rent (All)",
+    "median_rent_studio": "Median Rent (Studio)",
+    "median_rent_1br": "Median Rent (1BR)",
+    "median_rent_2br": "Median Rent (2BR)",
+    "median_rent_3br": "Median Rent (3BR)",
+    "median_rent_4br": "Median Rent (4BR)",
+    "median_rent_5br_plus": "Median Rent (5BR+)",
+    "fmr_studio": "FMR (Studio)",
+    "fmr_1br": "FMR (1BR)",
+    "fmr_2br": "FMR (2BR)",
+    "fmr_3br": "FMR (3BR)",
+    "fmr_4br": "FMR (4BR)",
 }
 
 RANKING_METRICS = [
@@ -250,15 +262,17 @@ with tab_lookup:
                         if "pct" in metric or "rate" in metric:
                             sign = "+" if "change" in metric else ""
                             st.metric(label, f"{value:{sign}.2f}%")
-                        elif metric in ("avg_annual_pay", "avg_weekly_wage"):
+                        elif "rent" in metric or "fmr" in metric or metric in ("avg_annual_pay", "avg_weekly_wage"):
                             st.metric(label, f"${value:,.0f}")
                         else:
                             st.metric(label, f"{value:,.0f}")
 
-            metro_col, city_col, county_col = st.columns(3)
-            render_snapshot(metro_col, "Metro Area", report.metro)
+            # Tract (most local) → metro (broadest)
+            tract_col, city_col, county_col, metro_col = st.columns(4)
+            render_snapshot(tract_col, "Neighborhood (Tract)", getattr(report, "tract", None))
             render_snapshot(city_col, "City", report.city)
             render_snapshot(county_col, "County", report.county)
+            render_snapshot(metro_col, "Metro Area", report.metro)
 
             # Warnings
             if report.warnings:
