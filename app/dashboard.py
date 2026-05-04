@@ -109,6 +109,15 @@ METRIC_LABELS = {
     "fmr_2br": "FMR (2BR)",
     "fmr_3br": "FMR (3BR)",
     "fmr_4br": "FMR (4BR)",
+    "jobs_in_tract": "Jobs in Tract",
+    "workers_living_in_tract": "Workers Living Here",
+    "jobs_workers_ratio": "Jobs : Workers",
+    "jobs_high_earner_pct": "High-Earner Jobs %",
+    "workers_high_earner_pct": "High-Earner Residents %",
+    "jobs_young_worker_pct": "Young Workers %",
+    "jobs_industry_goods_pct": "Goods-Producing %",
+    "jobs_industry_trade_pct": "Trade & Transport %",
+    "jobs_industry_services_pct": "Services %",
 }
 
 RANKING_METRICS = [
